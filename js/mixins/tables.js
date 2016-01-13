@@ -22,6 +22,7 @@
     },
     printRow: function(rowIndex, row) {
       var col, colIndex, j, k, len, len1, ref, ref1;
+      var maxHeight = 0;
       this.rowHeight = this.getRowHeight(row);
       if (this.rowY + this.rowHeight > this.page.height - this.page.margins.bottom) {
         this.addPage();
@@ -32,18 +33,22 @@
       ref = this.tableOptions.columns;
       for (colIndex = j = 0, len = ref.length; j < len; colIndex = ++j) {
         col = ref[colIndex];
+        if (this.y > maxHeight) {
+          maxHeight = this.y;
+        }
         this.printCol(rowIndex, row, colIndex, col);
       }
-      this.moveTo(this.tableOptions.margins.left + this.getWidth(), this.rowY + this.rowHeight).lineTo(this.tableOptions.margins.left, this.rowY + this.rowHeight).stroke();
+      this.moveTo(this.tableOptions.margins.left + this.getWidth(), maxHeight + this.tableOptions.padding.bottom).lineTo(this.tableOptions.margins.left, maxHeight + this.tableOptions.padding.bottom).stroke();
       if (this.needsVerticalLines()) {
         ref1 = this.tableOptions.columns;
         for (colIndex = k = 0, len1 = ref1.length; k < len1; colIndex = ++k) {
           col = ref1[colIndex];
-          this.moveTo(this.getXOfColumn(colIndex), this.rowY).lineTo(this.getXOfColumn(colIndex), this.rowY + this.rowHeight).stroke();
+          this.moveTo(this.getXOfColumn(colIndex), this.rowY).lineTo(this.getXOfColumn(colIndex), maxHeight + this.tableOptions.padding.bottom).stroke();
         }
-        this.moveTo(this.tableOptions.margins.left + this.getWidth(), this.rowY).lineTo(this.tableOptions.margins.left + this.getWidth(), this.rowY + this.rowHeight).stroke();
+        this.moveTo(this.tableOptions.margins.left + this.getWidth(), this.rowY).lineTo(this.tableOptions.margins.left + this.getWidth(), maxHeight + this.tableOptions.padding.bottom).stroke();
       }
-      return this.rowY += this.rowHeight;
+      this.rowY = maxHeight;
+      return this.rowY += this.tableOptions.padding.bottom;
     },
     printCol: function(rowIndex, row, colIndex, col) {
       var colOpt, text;
