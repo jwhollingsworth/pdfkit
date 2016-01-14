@@ -50,6 +50,49 @@
       this.rowY = maxHeight;
       return this.rowY += this.tableOptions.padding.bottom;
     },
+    printRow: function(rowIndex, row) {
+      var col, colIndex, j, k, len, len1, ref, ref1;
+      var tempCol;
+      var addingPage = false;
+      var maxHeight = 0;
+      this.rowHeight = this.getRowHeight(row);
+      ref = this.tableOptions.columns;
+
+      for (colIndex = j = 0, len = ref.length; j < len; colIndex = ++j) {
+        if (colIndex === 0) {
+          for (var i = 0; i < len; i++) {
+            tempCol = row[ref[i].id];
+            if (this.rowY + this.tableOptions.padding.bottom + (this.rowY - this.y) + this.rowHeight + 12 > this.page.height - this.page.margins.bottom) {
+              addingPage = true;
+            }
+          }
+          if (addingPage) {
+            this.addPage();
+            this.rowY = this.page.margins.top + this.tableOptions.margins.top;
+            this.printHeaderRow();
+            this.rowHeight = this.getRowHeight(row);
+            this.y = this.rowY;
+            addingPage = false;
+          }
+        }
+        col = ref[colIndex];
+        if (this.y > maxHeight) {
+          maxHeight = this.y;
+        }
+        this.printCol(rowIndex, row, colIndex, col);
+      }
+      this.moveTo(this.tableOptions.margins.left + this.getWidth(), maxHeight + this.tableOptions.padding.bottom).lineTo(this.tableOptions.margins.left, maxHeight + this.tableOptions.padding.bottom).stroke();
+      if (this.needsVerticalLines()) {
+        ref1 = this.tableOptions.columns;
+        for (colIndex = k = 0, len1 = ref1.length; k < len1; colIndex = ++k) {
+          col = ref1[colIndex];
+          this.moveTo(this.getXOfColumn(colIndex), this.rowY).lineTo(this.getXOfColumn(colIndex), maxHeight + this.tableOptions.padding.bottom).stroke();
+        }
+        this.moveTo(this.tableOptions.margins.left + this.getWidth(), this.rowY).lineTo(this.tableOptions.margins.left + this.getWidth(), maxHeight + this.tableOptions.padding.bottom).stroke();
+      }
+      this.rowY = maxHeight;
+      return this.rowY += this.tableOptions.padding.bottom;
+    },
     printCol: function(rowIndex, row, colIndex, col) {
       var colOpt, text;
       colOpt = this.tableOptions.columns[colIndex];
